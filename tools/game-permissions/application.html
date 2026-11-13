@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>許諾申請所 | ゲーム許諾管理</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="game-pages.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" defer></script>
+    <script src="supabase-config.js" defer></script>
+    <script src="supabase-application.js" defer></script>
+    
+<script src="workspace-discord-auth.js" defer></script></head>
+<body data-page="application">
+    <header><strong>許諾申請所</strong><a href="index.html">ゲーム許諾管理へ戻る</a></header>
+    <main>
+        <h1>許諾申請所</h1>
+        <p>入力できる項目だけ記入して申請できます。すべて任意です。メーカーへの送信は行われません。Supabase連携時の申請者はログインアカウントから記録します。</p><form id="game-form" class="permission-form">
+    <input type="hidden" id="edit-id">
+    <label for="title">ゲームタイトル</label><input id="title" maxlength="200">
+    <label for="store-url">ゲームストアURL</label><input id="store-url" type="url" placeholder="https://...">
+    <label for="official-url">ゲーム公式サイト</label><input id="official-url" type="url" placeholder="https://...">
+    <label for="stream-date">配信日（申請者のみ表示）</label><input id="stream-date" type="date">
+    <label for="request-note">備考（申請者のみ表示）</label><textarea id="request-note" rows="4"></textarea>
+    <div class="permission-actions"><button type="submit">申請を登録</button><button id="reset-form" type="button" class="secondary">クリア</button></div>
+</form><p id="remote-submit-status" role="status" aria-live="polite"></p>
+    </main>
+</body>
+</html>
