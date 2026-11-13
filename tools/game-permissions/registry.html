@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理編集 | ゲーム許諾管理</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="game-pages.css">
+    
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" defer></script><script src="supabase-config.js" defer></script><script src="workspace-discord-auth.js" defer></script></head>
+<body data-page="registry">
+    <header><strong>管理編集</strong><a href="index.html">許諾済みゲーム一覧へ戻る</a></header>
+    <main>
+        <h1>管理編集</h1>
+        <p>登録メーカー・登録カテゴリを追加、編集、削除できます。表示順は日本語の五十音順です。</p>
+        <p><a class="permission-button" href="discord.html">Discord文章から登録</a></p>
+        <div class="registry-grid">
+            <section class="permission-card">
+                <h2>登録メーカー</h2>
+                <form id="maker-registry-form" class="permission-actions">
+                    <input id="maker-registry-input" type="text" placeholder="メーカー名" required aria-label="追加するメーカー名">
+                    <button type="submit">登録</button>
+                </form>
+                <ul id="maker-registry-list" class="registry-list"></ul>
+            </section>
+            <section class="permission-card">
+                <h2>登録カテゴリ</h2>
+                <form id="category-registry-form" class="permission-actions">
+                    <input id="category-registry-input" type="text" placeholder="カテゴリ名" required aria-label="追加するカテゴリ名">
+                    <button type="submit">登録</button>
+                </form>
+                <ul id="category-registry-list" class="registry-list"></ul>
+            </section>
+        </div>
+    </main>
+</body>
+</html>
