@@ -10,13 +10,34 @@
       return;
     }
     const client = window.workspaceClient;
-    const { data, error } = await client.from('workspace_game_applications')
+    // Fetch prioritized applications at the database level, so older
+    // unreviewed requests cannot be excluded by a preliminary limit.
+    const base = () => client.from('workspace_game_applications')
       .select('id,title,store_url,official_url,stream_date,request_note,status,created_at')
-      .eq('applicant_id', access.user.id).order('created_at', { ascending: false }).limit(100);
-    if (error) { target.textContent = '申請履歴を取得できません：' + error.message; return; }
+      .eq('applicant_id', access.user.id);
+    const pending = await base().eq('status', '未確認')
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false }).limit(20);
+    if (pending.error) {
+      target.textContent = '申請履歴を取得できません：' + pending.error.message;
+      return;
+    }
+    const ordered = [...(pending.data || [])];
+    if (ordered.length < 20) {
+      const other = await base().neq('status', '未確認')
+        .order('created_at', { ascending: false })
+        .order('id', { ascending: false }).limit(20 - ordered.length);
+      if (other.error) {
+        target.textContent = '申請履歴を取得できません：' + other.error.message;
+        return;
+      }
+      ordered.push(...(other.data || []));
+    }
     target.replaceChildren();
-    if (!data?.length) { target.textContent = 'まだ申請はありません。'; return; }
-    const ordered=[...data].sort((a,b)=>Number((b.status||'未確認')==='未確認')-Number((a.status||'未確認')==='未確認')||new Date(b.created_at)-new Date(a.created_at)).slice(0,20);
+    if (!ordered.length) {
+      target.textContent = 'まだ申請はありません。';
+      return;
+    }
     for (const item of ordered) {
       const article = document.createElement('article');
       article.className = 'permission-entry workspace-compact-application';
