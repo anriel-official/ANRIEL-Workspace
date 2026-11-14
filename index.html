@@ -1,36 +1,114 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ゲーム許諾管理</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="tools/game-permissions/game-pages.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ANRIEL Workspace | AN:RIEL</title>
+  <meta name="description" content="AN:RIELメンバー向けの業務ツールポータル">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    :root { color-scheme: light; }
+    body { min-height:100vh; background:#f6f7fb; }
+    .portal-header { display:flex; justify-content:space-between; align-items:center; gap:16px; }
+    .portal-brand { font-weight:750; letter-spacing:.025em; color:#25273a; text-decoration:none; font-size:18px; }
+    .portal-header-actions { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+    .portal-user { color:#687087; font-size:13px; }
+    .portal-button { appearance:none; background:#fff; border:1px solid #d9dce7; border-radius:10px; padding:9px 14px; font:inherit; font-size:13px; color:#25273a; cursor:pointer; text-decoration:none; }
+    .portal-button:hover { border-color:#8c7ee5; }
+    .portal-main { max-width:1050px; margin:0 auto; padding:62px 22px 90px; }
+    .portal-eyebrow { color:#6b638e; font-size:12px; font-weight:750; letter-spacing:.14em; margin:0 0 12px; }
+    .portal-title { font-size:clamp(30px,5vw,43px); line-height:1.2; margin:0 0 16px; letter-spacing:-.035em; }
+    .portal-lead { margin:0; line-height:1.85; max-width:650px; }
+    .portal-section-title { font-size:20px; margin:56px 0 20px; }
+    .portal-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:18px; }
+    .portal-card { display:block; background:white; border:1px solid #e4e7ef; border-radius:18px; padding:26px; text-decoration:none; color:inherit; box-shadow:0 6px 24px #25305008; transition:border-color .15s,transform .15s; }
+    .portal-card:hover { border-color:#8c7ee5; transform:translateY(-2px); }
+    .portal-card h3 { font-size:19px; margin:0 0 10px; }
+    .portal-card p { margin:0; line-height:1.7; }
+    .portal-card .portal-card-link { display:inline-block; margin-top:22px; font-size:13px; color:#514b83; font-weight:700; }
+    .portal-placeholder { border:1px dashed #d7dbe6; border-radius:18px; padding:26px; color:#687087; background:#fafbfe; }
+    .portal-placeholder h3 { margin:0 0 10px; font-size:17px; color:#52596c; }
+    .portal-placeholder p { margin:0; line-height:1.7; }
+    .portal-status { font-size:14px; color:#687087; margin:18px 0; line-height:1.8; }
+    .portal-error { color:#9a2836; }
+    [hidden] { display:none !important; }
+    @media (max-width:600px) { .portal-header { align-items:flex-start; } .portal-main { padding-top:42px; } }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" defer></script>
+  <script src="tools/game-permissions/supabase-config.js" defer></script>
+  <script defer>
+    (() => {
+      'use strict';
+      window.addEventListener('DOMContentLoaded', async () => {
+        const status = document.getElementById('portal-status');
+        const content = document.getElementById('portal-content');
+        const userLabel = document.getElementById('portal-user');
+        const logout = document.getElementById('portal-logout');
+        const loginUrl = new URL('tools/game-permissions/login.html', location.href).href;
+        const config = window.WORKSPACE_SUPABASE_CONFIG || {};
+        const roles = {engineer:'エンジニア', admin:'管理者', staff:'スタッフ', talent:'タレント'};
+        if (!config.url || !config.publishableKey || !window.supabase?.createClient) {
+          status.textContent = '認証の準備ができませんでした。接続設定を確認してください。';
+          status.classList.add('portal-error');
+          return;
+        }
+        try {
+          const client = window.supabase.createClient(config.url, config.publishableKey);
+          const {data: {user}, error} = await client.auth.getUser();
+          if (error || !user) { location.replace(loginUrl); return; }
+          const {data: role, error: roleError} = await client.rpc('workspace_my_discord_role');
+          if (roleError) throw roleError;
+          if (!Object.hasOwn(roles, role)) {
+            status.textContent = 'このDiscordアカウントには利用権限がありません。運営に確認してください。';
+            status.classList.add('portal-error');
+            logout.hidden = false;
+          } else {
+            userLabel.textContent = roles[role] + 'としてログイン中';
+            status.hidden = true;
+            content.hidden = false;
+            logout.hidden = false;
+          }
+          logout.addEventListener('click', async () => {
+            logout.disabled = true;
+            try { await client.auth.signOut(); location.replace(loginUrl); }
+            catch (e) { status.hidden = false; status.textContent = 'ログアウトできませんでした。もう一度お試しください。'; logout.disabled = false; }
+          });
+        } catch (e) {
+          status.textContent = '権限を確認できませんでした。時間をおいて再読み込みしてください。';
+          status.classList.add('portal-error');
+          console.error('Workspace authentication failed:', e);
+        }
+      });
+    })();
+  </script>
 </head>
 <body>
-    <header>
-        <strong>ゲーム許諾管理</strong>
-    </header>
-    <main>
-        <h1>ゲーム許諾管理</h1>
-        <p>利用する機能を選択してください。</p>
-        <aside>ローカル試作版です。ログイン・共有権限は未実装です。機密情報は登録しないでください。</aside>
-        <div class="permission-grid">
-            <a class="permission-card" href="tools/game-permissions/approved.html">
-                <h2>許諾済みゲーム一覧</h2>
-                <p>登録されたゲームの許諾状況と配信条件を確認します。</p>
-            </a>
-            <a class="permission-card" href="tools/game-permissions/application.html">
-                <h2>許諾申請所</h2>
-                <p>ゲーム情報を手入力し、申請状況を管理します。</p>
-            </a>
-            <a class="permission-card" href="tools/game-permissions/registry.html">
-                <h2>管理編集</h2><p>メーカー・カテゴリの管理とDiscord文章からの登録。</p>
-            </a>
-            <a class="permission-card" href="tools/game-permissions/mypage.html">
-                <h2>マイページ</h2><p>自分の申請履歴とお気に入りを確認。</p>
-            </a>
-        </div>
-    </main>
+  <header class="portal-header">
+    <a class="portal-brand" href="./">ANRIEL Workspace</a>
+    <div class="portal-header-actions">
+      <span class="portal-user" id="portal-user"></span>
+      <button class="portal-button" id="portal-logout" type="button" hidden>ログアウト</button>
+    </div>
+  </header>
+  <main class="portal-main">
+    <p class="portal-eyebrow">AN:RIEL INTERNAL PORTAL</p>
+    <h1 class="portal-title">ANRIEL Workspace</h1>
+    <p class="portal-lead">AN:RIELメンバー向けの業務ポータルです。利用するツールを選択してください。</p>
+    <p class="portal-status" id="portal-status" role="status" aria-live="polite">ログイン情報を確認しています…</p>
+    <div id="portal-content" hidden>
+      <h2 class="portal-section-title">利用できるツール</h2>
+      <div class="portal-grid">
+        <a class="portal-card" href="tools/game-permissions/index.html">
+          <h3>ゲーム配信許諾管理</h3>
+          <p>配信許諾の確認・申請、ゲーム一覧の閲覧、申請履歴の管理ができます。</p>
+          <span class="portal-card-link">ツールを開く</span>
+        </a>
+        <section class="portal-placeholder" aria-label="今後のツール">
+          <h3>その他のツール</h3>
+          <p>今後、Workspaceに追加されるツールはこちらに表示されます。</p>
+        </section>
+      </div>
+    </div>
+  </main>
 </body>
 </html>
