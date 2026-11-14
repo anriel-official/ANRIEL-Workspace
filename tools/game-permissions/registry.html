@@ -9,13 +9,16 @@
     
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" defer></script><script src="supabase-config.js" defer></script><script src="workspace-discord-auth.js" defer></script><script src="../../js/workspace-account.js" defer></script></head>
 <body data-page="registry">
-    <header class="workspace-unified-header"><a class="workspace-header-brand" href="index.html">ゲーム許諾管理</a><nav class="workspace-header-nav" aria-label="ページ移動"><a href="../../index.html">ツール一覧に戻る</a><a href="index.html">ゲーム一覧に戻る</a></nav></header>
+    <header class="workspace-unified-header"><nav class="workspace-header-nav" aria-label="ページ移動"><a href="../../index.html">ツール一覧</a></nav><a class="workspace-header-brand" href="index.html">ゲーム許諾管理</a></header>
     <main>
         <h1>管理編集</h1>
         <p>登録メーカー・登録カテゴリを追加、編集、削除できます。表示順は日本語の五十音順です。</p>
-        <p><a class="permission-button" href="discord.html">Discord文章から登録</a></p>
-        <div class="registry-grid">
-            <section class="permission-card">
+        <div class="registry-tabs" role="tablist" aria-label="管理編集の切り替え">
+            <button type="button" role="tab" id="registry-tab-maker" aria-controls="registry-panel-maker" aria-selected="true" tabindex="0">登録メーカー</button>
+            <button type="button" role="tab" id="registry-tab-category" aria-controls="registry-panel-category" aria-selected="false" tabindex="-1">登録カテゴリー</button>
+        </div>
+        <div class="registry-panels">
+            <section class="permission-card" id="registry-panel-maker" role="tabpanel" aria-labelledby="registry-tab-maker">
                 <h2>登録メーカー</h2>
                 <form id="maker-registry-form" class="permission-actions">
                     <input id="maker-registry-input" type="text" placeholder="メーカー名" required aria-label="追加するメーカー名">
@@ -23,8 +26,8 @@
                 </form>
                 <ul id="maker-registry-list" class="registry-list"></ul>
             </section>
-            <section class="permission-card">
-                <h2>登録カテゴリ</h2>
+            <section class="permission-card" id="registry-panel-category" role="tabpanel" aria-labelledby="registry-tab-category" hidden>
+                <h2>登録カテゴリー</h2>
                 <form id="category-registry-form" class="permission-actions">
                     <input id="category-registry-input" type="text" placeholder="カテゴリ名" required aria-label="追加するカテゴリ名">
                     <button type="submit">登録</button>
@@ -33,5 +36,6 @@
             </section>
         </div>
     </main>
+    <script src="registry-tabs.js" defer></script>
 </body>
 </html>

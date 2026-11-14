@@ -393,3 +393,17 @@ body > header.workspace-unified-header {display:flex;align-items:center;gap:16px
 .workspace-unified-header .workspace-account {margin-left:auto;}
 @media(max-width:640px){.workspace-unified-header .workspace-account{margin-left:0}.workspace-header-nav{order:3;width:100%;}.workspace-header-nav a{flex:1;justify-content:center;}}
 #workspace-sync-status {font-weight:600;}
+
+/* Management editor: one panel at a time */
+.registry-tabs { display:flex; gap:8px; flex-wrap:wrap; margin:24px 0 16px; border-bottom:1px solid #dfe1eb; }
+.registry-tabs button { border:0; border-bottom:3px solid transparent; padding:12px 18px; background:transparent; color:#514c68; cursor:pointer; font:inherit; font-weight:600; }
+.registry-tabs button[aria-selected="true"] { border-bottom-color:#6556c9; color:#43359e; }
+.registry-tabs button:focus-visible { outline:2px solid #6556c9; outline-offset:2px; }
+.registry-panels > [hidden] { display:none !important; }
+.registry-panels > .permission-card { max-width:100%; }
+/* Shared header: workspace index first, current tool second */
+body > header.workspace-unified-header { gap:14px; }
+.workspace-header-nav { order:0; }
+.workspace-header-brand { order:1; }
+.workspace-unified-header .workspace-account { order:2; }
+@media(max-width:640px) { .workspace-header-nav { order:0; width:auto; } .workspace-header-nav a { flex:initial; } }
