@@ -1,49 +1,72 @@
 (() => {
  'use strict';
+ const $=id=>document.getElementById(id);
+ const text=(el,tag,value)=>{const node=document.createElement(tag);node.textContent=value;el.append(node);return node};
  async function init(){
-  const client=window.workspaceClient;
-  const access=await window.workspaceAccess();
+  const client=window.workspaceClient, access=await window.workspaceAccess();
   if(!access.user)return;
-  const uid=access.user.id, list=document.getElementById('personal-list'), status=document.getElementById('personal-status');
-  const key=document.getElementById('personal-game-key'),note=document.getElementById('personal-note'),favorite=document.getElementById('personal-favorite');
-  async function refresh(){
-   const [f,n,g]=await Promise.all([
+  const uid=access.user.id, list=$('personal-list'), status=$('personal-status');
+  async function refreshFavorites(){
+   const [f,g]=await Promise.all([
     client.from('workspace_game_favorites').select('game_key').eq('auth_user_id',uid),
-    client.from('workspace_game_personal_notes').select('game_key,note').eq('auth_user_id',uid),
     client.from('workspace_game_records').select('id,status,details').limit(1000)
    ]);
-   if(f.error||n.error){status.textContent='個人データを取得できません。';return;}
-   const favs=new Set((f.data||[]).map(x=>x.game_key));
-   const notes=new Map((n.data||[]).map(x=>[x.game_key,x.note]));
+   if(f.error){status.textContent='お気に入りを取得できません：'+f.error.message;return;}
    const games=new Map((g.data||[]).map(x=>[String(x.id),x]));
    list.replaceChildren();
-   for(const k of new Set([...favs,...notes.keys()])){
-    const row=document.createElement('p');
-    const game=games.get(String(k));
-    const d=game?.details||{};
-    const gameTitle=d.entryType==='maker'
-     ? `【${d.maker||'メーカー未設定'}】${d.scopeType==='series'?(d.scopeName||'特定シリーズ'):d.scopeType==='partial'?'一部タイトル':'全タイトル'}`
-     : (d.title||k);
-    row.textContent=`${gameTitle}${game?'　｜　'+game.status:''}${notes.get(k)?'　｜　'+notes.get(k):''}　`;
-    if(game){const a=document.createElement('a');a.href='approved.html';a.textContent='ゲーム一覧で確認';row.append(a);}
-    const edit=document.createElement('button');edit.textContent='編集';
-    edit.onclick=()=>{key.value=k;note.value=notes.get(k)||'';favorite.checked=favs.has(k);key.focus()};
-    row.append(edit);list.append(row);
+   if(!(f.data||[]).length){text(list,'p','お気に入りのゲームはありません。');return;}
+   for(const item of f.data){
+    const k=String(item.game_key),game=games.get(k),d=game?.details||{};
+    const title=game?(d.entryType==='maker'?`【${d.maker||'メーカー未設定'}】${d.scopeType==='series'?(d.scopeName||'特定シリーズ'):d.scopeType==='partial'?'一部タイトル':'全タイトル'}`:(d.title||k)):k;
+    const row=document.createElement('div');row.className='workspace-favorite-row';
+    const info=document.createElement('div');info.className='workspace-favorite-info';text(info,'strong',title);
+    if(game)text(info,'small',game.status||'');
+    const btn=text(row,'button','お気に入り解除');btn.type='button';btn.className='workspace-unfavorite';
+    btn.onclick=async()=>{
+     if(btn.disabled)return;btn.disabled=true;
+     const {error}=await client.from('workspace_game_favorites').delete().eq('auth_user_id',uid).eq('game_key',k);
+     if(error){status.textContent='解除できません：'+error.message;btn.disabled=false;return;}
+     status.textContent='お気に入りを解除しました。';await refreshFavorites();
+    };
+    row.prepend(info);list.append(row);
    }
   }
-  document.getElementById('personal-data-form').addEventListener('submit',async e=>{
-   e.preventDefault();const k=key.value.trim();if(!k)return;
-   let err;
-   if(favorite.checked)({error:err}=await client.from('workspace_game_favorites').upsert({auth_user_id:uid,game_key:k}));
-   else ({error:err}=await client.from('workspace_game_favorites').delete().eq('auth_user_id',uid).eq('game_key',k));
-   if(!err){
-    if(note.value.trim())({error:err}=await client.from('workspace_game_personal_notes').upsert({auth_user_id:uid,game_key:k,note:note.value.trim(),updated_at:new Date().toISOString()}));
-    else ({error:err}=await client.from('workspace_game_personal_notes').delete().eq('auth_user_id',uid).eq('game_key',k));
+  async function refreshMemos(){
+   const {data,error}=await client.from('workspace_user_memos').select('id,title,body,updated_at').eq('auth_user_id',uid).order('updated_at',{ascending:false});
+   if(error){$('memo-status').textContent='メモを取得できません：'+error.message;return;}
+   const memos=data||[];$('memo-count').textContent=`${memos.length} / 10`;
+   $('memo-save').disabled=!$('memo-id').value&&memos.length>=10;
+   const target=$('memo-list');target.replaceChildren();
+   if(!memos.length)text(target,'p','メモはまだありません。');
+   for(const memo of memos){
+    const row=document.createElement('article');row.className='workspace-memo-item';
+    text(row,'h3',memo.title);text(row,'p',memo.body);
+    const actions=document.createElement('div');actions.className='permission-actions';
+    const edit=text(actions,'button','編集');edit.type='button';edit.onclick=()=>{
+     $('memo-id').value=memo.id;$('memo-title').value=memo.title;$('memo-body').value=memo.body;
+     $('memo-save').disabled=false;$('memo-cancel').hidden=false;$('memo-title').focus();
+    };
+    const del=text(actions,'button','削除');del.type='button';del.onclick=async()=>{
+     if(!confirm('このメモを削除しますか？'))return;
+     const {error:e}=await client.from('workspace_user_memos').delete().eq('id',memo.id).eq('auth_user_id',uid);
+     if(e){$('memo-status').textContent='削除できません：'+e.message;return;}
+     if($('memo-id').value===memo.id)resetForm();await refreshMemos();
+    };
+    row.append(actions);target.append(row);
    }
-   status.textContent=err?'保存できませんでした。':'保存しました。';
-   if(!err)await refresh();
+  }
+  function resetForm(){ $('memo-form').reset();$('memo-id').value='';$('memo-cancel').hidden=true;$('memo-save').disabled=false; }
+  $('memo-cancel').onclick=async()=>{resetForm();await refreshMemos();};
+  $('memo-form').addEventListener('submit',async e=>{
+   e.preventDefault();const id=$('memo-id').value,title=$('memo-title').value.trim(),body=$('memo-body').value.trim();
+   if(!title||!body)return;
+   $('memo-save').disabled=true;
+   const q=id?client.from('workspace_user_memos').update({title,body}).eq('id',id).eq('auth_user_id',uid):client.from('workspace_user_memos').insert({auth_user_id:uid,title,body});
+   const {error}=await q;
+   if(error){$('memo-status').textContent='保存できません：'+error.message;$('memo-save').disabled=false;return;}
+   $('memo-status').textContent='メモを保存しました。';resetForm();await refreshMemos();
   });
-  await refresh();
+  await Promise.all([refreshFavorites(),refreshMemos()]);
  }
- document.addEventListener('DOMContentLoaded',()=>init().catch(()=>{}));
+ document.addEventListener('DOMContentLoaded',()=>init().catch(e=>{if($('personal-status'))$('personal-status').textContent=e.message;}));
 })();

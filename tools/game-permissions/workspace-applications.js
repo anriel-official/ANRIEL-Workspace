@@ -12,11 +12,12 @@
     const client = window.workspaceClient;
     const { data, error } = await client.from('workspace_game_applications')
       .select('id,title,store_url,official_url,stream_date,request_note,status,created_at')
-      .eq('applicant_id', access.user.id).order('created_at', { ascending: false });
+      .eq('applicant_id', access.user.id).order('created_at', { ascending: false }).limit(100);
     if (error) { target.textContent = '申請履歴を取得できません：' + error.message; return; }
     target.replaceChildren();
     if (!data?.length) { target.textContent = 'まだ申請はありません。'; return; }
-    for (const item of data) {
+    const ordered=[...data].sort((a,b)=>Number((b.status||'未確認')==='未確認')-Number((a.status||'未確認')==='未確認')||new Date(b.created_at)-new Date(a.created_at)).slice(0,20);
+    for (const item of ordered) {
       const article = document.createElement('article');
       article.className = 'permission-entry workspace-compact-application';
       const heading = document.createElement('h3');

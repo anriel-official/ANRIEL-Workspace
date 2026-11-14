@@ -18,7 +18,7 @@
   <main>
     <div class="workspace-page-heading">
       <h1>マイページ</h1>
-      <p>Discord連携アカウント、お気に入り、申請中のゲームを確認できます。</p>
+      <p>Discord連携アカウント、お気に入り、申請中のゲーム、メモを管理できます。</p>
     </div>
     <section class="workspace-panel workspace-profile-panel" aria-label="Discord連携アカウント">
       <h2>Discord連携アカウント</h2>
@@ -30,26 +30,30 @@
     <div class="workspace-my-tabs" role="tablist" aria-label="マイページの表示切替">
       <button type="button" id="tab-favorites" role="tab" aria-controls="panel-favorites" aria-selected="true">お気に入りゲーム</button>
       <button type="button" id="tab-applications" role="tab" aria-controls="panel-applications" aria-selected="false" tabindex="-1">申請中のゲーム</button>
+      <button type="button" id="tab-notes" role="tab" aria-controls="panel-notes" aria-selected="false" tabindex="-1">メモ</button>
     </div>
     <section id="panel-favorites" role="tabpanel" aria-labelledby="tab-favorites" class="workspace-panel workspace-mypage-section">
       <h2>お気に入りゲーム</h2>
-      <p class="workspace-description">お気に入りと個人メモを管理できます。</p>
       <div id="personal-list" class="workspace-personal-list"></div>
-      <details class="workspace-personal-editor"><summary>お気に入り・メモを追加・編集</summary>
-      <form id="personal-data-form" class="permission-form workspace-personal-form">
-        <label for="personal-game-key">ゲーム名・識別名</label>
-        <input id="personal-game-key" maxlength="250" required>
-        <label class="workspace-checkbox-label"><input type="checkbox" id="personal-favorite">お気に入りに登録</label>
-        <label for="personal-note">個人メモ</label>
-        <textarea id="personal-note" maxlength="4000" rows="4"></textarea>
-        <div class="permission-actions"><button type="submit">保存する</button></div>
-      </form>
       <p id="personal-status" class="workspace-status" role="status" aria-live="polite"></p>
-      </details>
     </section>
     <section id="panel-applications" role="tabpanel" aria-labelledby="tab-applications" class="workspace-panel workspace-mypage-section" hidden>
       <h2>申請中のゲーム</h2>
       <div id="profile-applications" class="permission-list" aria-live="polite"></div>
+    </section>
+    <section id="panel-notes" role="tabpanel" aria-labelledby="tab-notes" class="workspace-panel workspace-mypage-section" hidden>
+      <h2>メモ <span id="memo-count" class="workspace-memo-count">0 / 10</span></h2>
+      <p class="workspace-description">個人用メモを10件まで保存できます。</p>
+      <form id="memo-form" class="permission-form workspace-personal-form">
+        <input type="hidden" id="memo-id">
+        <label for="memo-title">タイトル</label>
+        <input id="memo-title" maxlength="120" required placeholder="メモのタイトル">
+        <label for="memo-body">内容</label>
+        <textarea id="memo-body" maxlength="4000" rows="5" required placeholder="メモの内容"></textarea>
+        <div class="permission-actions"><button type="submit" id="memo-save">保存</button><button type="button" id="memo-cancel" hidden>編集をキャンセル</button></div>
+      </form>
+      <p id="memo-status" class="workspace-status" role="status" aria-live="polite"></p>
+      <div id="memo-list" class="workspace-memo-list"></div>
     </section>
   </main>
 </body>

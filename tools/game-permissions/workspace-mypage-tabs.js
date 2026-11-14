@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   document.addEventListener('DOMContentLoaded', () => {
-    const names = ['favorites','applications'];
+    const names = ['favorites','applications','notes'];
     function activate(name) {
       for (const n of names) {
         const tab=document.getElementById('tab-'+n),panel=document.getElementById('panel-'+n);
