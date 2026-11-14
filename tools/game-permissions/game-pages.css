@@ -383,3 +383,13 @@ body[data-page="mypage"] .workspace-memo-count{font-size:12px;color:#697083;font
 body[data-page="mypage"] .workspace-my-tabs{overflow-x:auto}
 body[data-page="mypage"] .workspace-my-tabs button{white-space:nowrap}
 @media(max-width:600px){body[data-page="mypage"] .workspace-favorite-row{align-items:flex-start;flex-direction:column}}
+
+/* 全ページ共通ヘッダー：左にナビゲーション、右にDiscordプロフィール */
+body > header.workspace-unified-header {display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.workspace-header-brand {font-weight:750;color:#25273a!important;text-decoration:none!important;white-space:nowrap;}
+.workspace-header-nav {display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.workspace-header-nav a {display:inline-flex;align-items:center;min-height:36px;padding:6px 12px;border:1px solid #dfe1eb;border-radius:9px;background:#fff;color:#50498a;text-decoration:none;font-size:13px;font-weight:600;}
+.workspace-header-nav a:hover {background:#f5f3ff;border-color:#aea4e7;text-decoration:none;}
+.workspace-unified-header .workspace-account {margin-left:auto;}
+@media(max-width:640px){.workspace-unified-header .workspace-account{margin-left:0}.workspace-header-nav{order:3;width:100%;}.workspace-header-nav a{flex:1;justify-content:center;}}
+#workspace-sync-status {font-weight:600;}

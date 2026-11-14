@@ -112,7 +112,7 @@
    tabs.forEach((tab,i)=>tab?.addEventListener('click',()=>{tabs.forEach((t,j)=>{t.setAttribute('aria-selected',String(i===j));panels[j].hidden=i!==j})}));
    $('review-form')?.addEventListener('submit',async e=>{e.preventDefault();const record=records.find(r=>r.id===$('review-id').value);if(!record)return notice('編集する案件を選択してください。',true);
     const d={...record.details};for(const field of fields)d[field]=value('review',field);if(d.entryType==='maker'&&!d.maker)return notice('メーカー名が必要です。',true);
-    try{await persist(record,d,$('status').value);$('review-form').reset();$('review-id').value=''}catch(err){notice('保存失敗：'+err.message,true)}
+    try{await persist(record,d,$('status').value);$('review-form').reset();$('review-id').value='';window.scrollTo({top:0,behavior:'smooth'});notice('保存しました。')}catch(err){notice('保存失敗：'+err.message,true)}
    });
    $('direct-add-form')?.addEventListener('submit',async e=>{e.preventDefault();const d={};for(const field of fields)d[field]=value('direct',field);
     if(d.entryType==='maker'?!d.maker:!d.title&&!d.maker)return notice('ゲーム名またはメーカー名を入力してください。',true);

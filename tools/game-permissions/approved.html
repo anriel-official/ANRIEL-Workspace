@@ -9,7 +9,7 @@
     
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" defer></script><script src="supabase-config.js" defer></script><script src="workspace-discord-auth.js" defer></script><script src="../../js/workspace-account.js" defer></script></head>
 <body data-page="approved">
-    <header><strong>許諾済みゲーム一覧</strong><a href="index.html">ゲーム許諾管理へ戻る</a><a class="workspace-header-link" href="../../index.html">ツール一覧へ戻る</a></header>
+    <header class="workspace-unified-header"><a class="workspace-header-brand" href="index.html">ゲーム許諾管理</a><nav class="workspace-header-nav" aria-label="ページ移動"><a href="../../index.html">ツール一覧に戻る</a><a href="index.html">ゲーム一覧に戻る</a></nav></header>
     <main>
         <h1>許諾済みゲーム一覧</h1>
         <div class="permission-actions"><input id="search" type="search" placeholder="ゲーム名・メーカー名で検索" aria-label="ゲーム検索"><select id="category-filter" aria-label="カテゴリ検索"><option value="">すべてのカテゴリ</option></select><label class="favorite-filter"><input id="favorites-only" type="checkbox"> お気に入りのみ</label></div><section class="maker-list-section"><h2>メーカー・権利元単位の許諾</h2><p>メーカー全体・一部作品・シリーズ単位の許諾をまとめています。作品ごとの条件も確認してください。</p><div id="maker-game-list" class="permission-list"></div></section><section class="individual-list-section"><h2>個別ゲームの許諾</h2><div id="game-list" class="permission-list"></div></section>
