@@ -18,19 +18,18 @@
     if (!data?.length) { target.textContent = 'まだ申請はありません。'; return; }
     for (const item of data) {
       const article = document.createElement('article');
-      article.className = 'permission-entry';
+      article.className = 'permission-entry workspace-compact-application';
       const heading = document.createElement('h3');
       heading.textContent = item.title || 'タイトル未入力';
       article.append(heading);
       const fields = [
         ['許諾状況', item.status || '未確認'],
-        ['申請日時', item.created_at ? new Date(item.created_at).toLocaleString('ja-JP') : '不明'],
-        ['配信予定日', item.stream_date || '未入力'],
-        ['備考', item.request_note || 'なし']
+        ...(item.stream_date ? [['配信予定日', item.stream_date]] : []),
+        ...(item.request_note ? [['備考', item.request_note]] : [])
       ];
       for (const [name, value] of fields) {
         const p = document.createElement('p');
-        p.textContent = `${name}：${value}`;
+        p.textContent = `${name}：${value}`;p.className='workspace-compact-meta';
         article.append(p);
       }
       for (const [name, url] of [['ストア', item.store_url], ['公式サイト', item.official_url]]) {

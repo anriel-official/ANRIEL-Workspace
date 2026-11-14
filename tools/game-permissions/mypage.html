@@ -11,21 +11,31 @@
   <script src="workspace-discord-auth.js" defer></script>
   <script src="workspace-personal.js" defer></script>
   <script src="workspace-applications.js" defer></script>
-</head>
+  <script src="workspace-mypage-tabs.js" defer></script>
+<script src="../../js/workspace-account.js" defer></script></head>
 <body data-page="mypage">
   <header><a class="workspace-brand" href="index.html">ゲーム許諾管理</a><a class="workspace-header-link" href="index.html">ゲーム許諾管理へ戻る</a><a class="workspace-header-link" href="../../index.html">ツール一覧へ戻る</a></header>
   <main>
     <div class="workspace-page-heading">
       <h1>マイページ</h1>
-      <p>自分の申請履歴と、お気に入り・個人メモを管理できます。</p>
+      <p>Discord連携アカウント、お気に入り、申請中のゲームを確認できます。</p>
     </div>
-    <section class="workspace-panel workspace-mypage-section">
-      <div class="workspace-section-heading"><h2>自分の申請履歴</h2></div>
-      <div id="profile-applications" class="permission-list" aria-live="polite"></div>
+    <section class="workspace-panel workspace-profile-panel" aria-label="Discord連携アカウント">
+      <h2>Discord連携アカウント</h2>
+      <div class="workspace-profile-line">
+        <img id="workspace-profile-avatar" alt="" width="56" height="56">
+        <div><strong id="workspace-profile-name">読み込み中…</strong><p id="workspace-profile-discord-id">Discordアカウントを確認しています…</p></div>
+      </div>
     </section>
-    <section id="personal-game-data" class="workspace-panel workspace-mypage-section">
-      <div class="workspace-section-heading"><h2>お気に入り・個人メモ</h2></div>
-      <p class="workspace-description">登録した内容は自分のアカウントにのみ保存されます。</p>
+    <div class="workspace-my-tabs" role="tablist" aria-label="マイページの表示切替">
+      <button type="button" id="tab-favorites" role="tab" aria-controls="panel-favorites" aria-selected="true">お気に入りゲーム</button>
+      <button type="button" id="tab-applications" role="tab" aria-controls="panel-applications" aria-selected="false" tabindex="-1">申請中のゲーム</button>
+    </div>
+    <section id="panel-favorites" role="tabpanel" aria-labelledby="tab-favorites" class="workspace-panel workspace-mypage-section">
+      <h2>お気に入りゲーム</h2>
+      <p class="workspace-description">お気に入りと個人メモを管理できます。</p>
+      <div id="personal-list" class="workspace-personal-list"></div>
+      <details class="workspace-personal-editor"><summary>お気に入り・メモを追加・編集</summary>
       <form id="personal-data-form" class="permission-form workspace-personal-form">
         <label for="personal-game-key">ゲーム名・識別名</label>
         <input id="personal-game-key" maxlength="250" required>
@@ -35,7 +45,11 @@
         <div class="permission-actions"><button type="submit">保存する</button></div>
       </form>
       <p id="personal-status" class="workspace-status" role="status" aria-live="polite"></p>
-      <div id="personal-list" class="workspace-personal-list"></div>
+      </details>
+    </section>
+    <section id="panel-applications" role="tabpanel" aria-labelledby="tab-applications" class="workspace-panel workspace-mypage-section" hidden>
+      <h2>申請中のゲーム</h2>
+      <div id="profile-applications" class="permission-list" aria-live="polite"></div>
     </section>
   </main>
 </body>

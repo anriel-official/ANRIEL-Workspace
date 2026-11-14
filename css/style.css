@@ -105,3 +105,14 @@ aside {
         padding:16px
     }
 }
+
+/* Shared Workspace account control */
+body > header {gap:14px;flex-wrap:wrap}
+.workspace-account{margin-left:auto;display:flex;align-items:center}
+.workspace-account-link{display:flex;align-items:center;gap:9px;padding:5px 10px;border:1px solid #e0e3ec;border-radius:999px;background:#fff;color:#30334b!important;text-decoration:none!important;font-size:13px;font-weight:650;max-width:240px}
+.workspace-account-link:hover{background:#f5f3ff;border-color:#aea4e7}
+.workspace-account-avatar,.workspace-avatar-fallback{width:32px;height:32px;border-radius:50%;object-fit:cover;flex:none}
+.workspace-avatar-fallback{display:grid;place-items:center;background:#eae7f7;color:#554aa0}
+.workspace-account-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+[hidden]{display:none!important}
+@media(max-width:600px){.workspace-account-link{max-width:180px}.workspace-account-name{max-width:110px}}

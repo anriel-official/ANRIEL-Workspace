@@ -53,7 +53,7 @@
           return;
         }
         try {
-          const client = window.supabase.createClient(config.url, config.publishableKey);
+          const client = window.workspaceClient || (window.workspaceClient = window.supabase.createClient(config.url, config.publishableKey));
           const {data: {user}, error} = await client.auth.getUser();
           if (error || !user) { location.replace(loginUrl); return; }
           const {data: role, error: roleError} = await client.rpc('workspace_my_discord_role');
@@ -81,7 +81,7 @@
       });
     })();
   </script>
-</head>
+<script src="js/workspace-account.js" defer></script></head>
 <body>
   <header class="portal-header">
     <a class="portal-brand" href="./">ANRIEL Workspace</a>
