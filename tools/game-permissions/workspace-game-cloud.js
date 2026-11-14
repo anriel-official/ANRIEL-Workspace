@@ -6,7 +6,19 @@
  const operators=['engineer','admin','staff'];
  const fields=['entryType','title','maker','scopeType','scopeName','category','store-url','official-url','coverage-notes','required-text','recommended-text','superchat','monetize','source','source-url'];
  const pendingStatuses=['未確認','確認中','申請中'];
- let records=[],isOperator=false,uid='',favoriteKeys=new Set();
+ let records=[],isOperator=false,uid='',favoriteKeys=new Set(),applicantNames=new Map();
+ const applicantName=record=>{
+  const d=record.details||{};
+  return applicantNames.get(d.applicantId)||d.applicantName||d.applicantId||'申請者未設定';
+ };
+ async function loadApplicantNames(){
+  if(!isOperator)return;
+  const {data,error}=await client.rpc('workspace_list_discord_members');
+  if(error){console.warn('申請者名を取得できませんでした:',error.message);return;}
+  applicantNames=new Map((Array.isArray(data)?data:[])
+   .filter(member=>member.auth_user_id&&member.display_name)
+   .map(member=>[member.auth_user_id,member.display_name]));
+ }
  const text=(node,tag,value)=>{const e=document.createElement(tag);e.textContent=value??'';node.append(e);return e};
  const notice=(message,error=false)=>{let e=$('workspace-sync-status');if(!e){e=document.createElement('p');e.id='workspace-sync-status';document.querySelector('main').prepend(e)}e.textContent=message;e.style.color=error?'#b45309':''};
  const title=r=>r.details.entryType==='maker'?`【${r.details.maker||'メーカー未設定'}】${r.details.scopeType==='series'?(r.details.scopeName||'特定シリーズ'):r.details.scopeType==='partial'?'一部タイトル':'全タイトル'}`:r.details.title||'タイトル未設定';
@@ -34,7 +46,7 @@
  function populate(record){
   const d=record.details;
   for(const field of fields){const id='review-'+({'scopeType':'scope','scopeName':'scope-name'}[field]||field);if($(id))$(id).value=d[field]||''}
-  for(const [id,val] of [['review-id',record.id],['status',record.status],['review-applicant',d.applicantName||d.applicantId||'申請者'],['review-created-at',d.createdAt||record.created_at],['review-stream-date',d['stream-date']||''],['review-request-note',d['request-note']||'']])if($(id))$(id).value=val;
+  for(const [id,val] of [['review-id',record.id],['status',record.status],['review-applicant',applicantName(record)],['review-created-at',d.createdAt||record.created_at],['review-stream-date',d['stream-date']||''],['review-request-note',d['request-note']||'']])if($(id))$(id).value=val;
   toggleScope('review');$('review-form')?.scrollIntoView({behavior:'smooth'});
  }
  function toggleScope(prefix){const maker=value(prefix,'entryType')==='maker';
@@ -45,7 +57,7 @@
  function card(parent,record){
   const card=text(parent,'article','');card.className='permission-entry';text(card,'h3',title(record));text(card,'p','許諾状況：'+record.status);
   if(page==='pending'){
-   text(card,'p','申請者：'+(record.details.applicantName||record.details.applicantId||'運営による登録'));
+   text(card,'p','申請者：'+(applicantName(record)));
    text(card,'p','備考：'+(record.details['request-note']||'なし'));
    const actions=text(card,'div','');actions.className='permission-actions';
    button(actions,'編集',()=>populate(record));button(actions,'削除',()=>remove(record));return;
@@ -108,7 +120,7 @@
     try{await persist(null,d,value('direct','status')||'未確認');$('direct-add-form').reset()}catch(err){notice('登録失敗：'+err.message,true)}
    });
   }else{for(const id of ['search','category-filter','favorites-only'])$(id)?.addEventListener('input',render)}
-  try{await load()}catch(err){notice('データ取得失敗：'+err.message,true)}
+  try{await loadApplicantNames();await load()}catch(err){notice('データ取得失敗：'+err.message,true)}
  }
  init();
 })();
