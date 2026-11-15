@@ -87,10 +87,36 @@
   const form=text(container,'form','');form.className='permission-form';
   const labels={entryType:'登録対象',title:'ゲームタイトル',maker:'メーカー',scopeType:'許諾範囲',scopeName:'対象シリーズ名',category:'カテゴリ','store-url':'ゲームストアURL','official-url':'ゲーム公式サイト','coverage-notes':'特記事項','stream-end-date':'配信期限','required-text':'必須記載事項','recommended-text':'推奨記載事項',superchat:'スパチャ・スパステ',monetize:'収益化',source:'許諾根拠','source-url':'参照URL'};
   const orderedFields=['entryType','title','maker','category','store-url','official-url','required-text','recommended-text','coverage-notes','stream-end-date','scopeType','scopeName','superchat','monetize','source','source-url'];
-  for(const field of orderedFields){const label=text(form,'label',labels[field]);const input=text(label,['coverage-notes','required-text','recommended-text'].includes(field)?'textarea':'input','');input.dataset.field=field;input.value=record.details[field]||'';if(field==='stream-end-date')input.type='date';if(field==='entryType')input.readOnly=true;
+  const choices={
+   superchat:['未確認','OK','NG'],
+   monetize:['未確認','可能','条件付き','不可'],
+   source:['未確認','公式ガイドライン','個別許諾']
+  };
+  const makeSelect=(field,options)=>{
+   const label=text(form,'label',labels[field]);
+   const select=text(label,'select','');
+   select.dataset.field=field;
+   for(const option of options){const node=text(select,'option',option);node.value=option;}
+   const current=record.details[field]||'';
+   if(current&&!options.includes(current)){const node=text(select,'option',current);node.value=current;}
+   select.value=current||options[0];
+   return select;
+  };
+  for(const field of orderedFields){
+   if(choices[field]){makeSelect(field,choices[field]);continue;}
+   const label=text(form,'label',labels[field]);
+   const input=text(label,['coverage-notes','required-text','recommended-text'].includes(field)?'textarea':'input','');
+   input.dataset.field=field;input.value=record.details[field]||'';
+   if(field==='stream-end-date')input.type='date';
+   if(field==='entryType')input.readOnly=true;
    if(['maker','category'].includes(field)){input.type='hidden';window.workspaceRegistry.createSelect(input,field);}
   }
-  const statusLabel=text(form,'label','許諾状況');const status=text(statusLabel,'select','');for(const s of [...pendingStatuses,'条件付き','許諾済み','不可']){const opt=text(status,'option',s);opt.value=s}status.value=record.status;
+  const statusLabel=text(form,'label','許諾状況');
+  const status=text(statusLabel,'select','');
+  for(const s of [...pendingStatuses,'条件付き','許諾済み','不可']){
+   const opt=text(status,'option',s);opt.value=s;
+  }
+  status.value=record.status;
   const submit=text(form,'button','保存');submit.type='submit';
   form.addEventListener('submit',async e=>{e.preventDefault();const d={...record.details};for(const input of form.querySelectorAll('[data-field]'))d[input.dataset.field]=input.value.trim();
    try{await persist(record,d,status.value)}catch(err){notice('保存失敗：'+err.message,true)}});
