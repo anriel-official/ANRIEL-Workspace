@@ -4,7 +4,7 @@
  const page=document.body.dataset.page;
  const $=id=>document.getElementById(id);
  const operators=['engineer','admin','staff'];
- const fields=['entryType','title','maker','scopeType','scopeName','category','store-url','official-url','coverage-notes','required-text','recommended-text','superchat','monetize','source','source-url'];
+ const fields=['entryType','title','maker','scopeType','scopeName','category','store-url','official-url','coverage-notes','stream-end-date','required-text','recommended-text','superchat','monetize','source','source-url'];
  const pendingStatuses=['未確認','確認中','申請中'];
  let records=[],isOperator=false,uid='',favoriteKeys=new Set(),applicantNames=new Map();
  const applicantName=record=>{
@@ -22,8 +22,11 @@
  const text=(node,tag,value)=>{const e=document.createElement(tag);e.textContent=value??'';node.append(e);return e};
  const notice=(message,error=false)=>{let e=$('workspace-sync-status');if(!e){e=document.createElement('p');e.id='workspace-sync-status';document.querySelector('main').prepend(e)}e.textContent=message;e.style.color=error?'#b45309':''};
  const title=r=>r.details.entryType==='maker'?`【${r.details.maker||'メーカー未設定'}】${r.details.scopeType==='series'?(r.details.scopeName||'特定シリーズ'):r.details.scopeType==='partial'?'一部タイトル':'全タイトル'}`:r.details.title||'タイトル未設定';
- const value=(prefix,field)=>$(prefix+'-'+({'scopeType':'scope','scopeName':'scope-name'}[field]||field))?.value?.trim()||'';
- const detailFields=[['メーカー','maker'],['カテゴリ','category'],['配信条件','coverage-notes'],['必須記載事項','required-text'],['推奨記載事項','recommended-text'],['スパチャ・スパステ','superchat'],['収益化','monetize'],['根拠','source'],['参照URL','source-url'],['ゲームストア','store-url'],['公式サイト','official-url']];
+ const value=(prefix,field)=>$(prefix==='review'&&['required-text','recommended-text','superchat','status','monetize','source','source-url'].includes(field)?field:prefix+'-'+({'scopeType':'scope','scopeName':'scope-name'}[field]||field))?.value?.trim()||'';
+ const expiryText=d=>{const date=d['stream-end-date'];if(!/^\d{4}-\d{2}-\d{2}$/.test(date||''))return '';const [y,m,day]=date.split('-').map(Number);const valid=new Date(Date.UTC(y,m-1,day));if(valid.getUTCFullYear()!==y||valid.getUTCMonth()!==m-1||valid.getUTCDate()!==day)return '';return `${y}.${String(m).padStart(2,'0')}.${String(day).padStart(2,'0')}まで可能`;};
+ const syncPeriod=prefix=>{const check=$(prefix+'-stream-period-enabled'),date=$(prefix+'-stream-end-date');if(check&&date){date.disabled=!check.checked;if(!check.checked)date.value='';}};
+ const periodValue=prefix=>$(prefix+'-stream-period-enabled')?.checked?value(prefix,'stream-end-date'):'';
+ const detailFields=[['登録対象','entryType'],['ゲームタイトル','title'],['メーカー','maker'],['カテゴリ','category'],['ゲームストアURL','store-url'],['ゲーム公式サイト','official-url'],['必須記載事項','required-text'],['推奨記載事項','recommended-text'],['特記事項','coverage-notes'],['配信期限','stream-end-date'],['スパチャ・スパステ','superchat'],['収益化','monetize'],['許諾の根拠','source'],['参照URL','source-url']];
  const urlLink=(container,label,v)=>{try{const u=new URL(v);if(!['http:','https:'].includes(u.protocol))return;const a=text(container,'a',label+'を開く');a.href=u.href;a.target='_blank';a.rel='noopener noreferrer'}catch{}};
  const button=(parent,label,fn)=>{const b=text(parent,'button',label);b.type='button';b.addEventListener('click',fn);return b};
  async function load(){
@@ -36,6 +39,7 @@
  async function persist(record,details,status){
   if(!isOperator)return;
   await window.workspaceRegistry.saveChoices(details);
+  await window.workspaceRegistry?.saveChoices(details);
   const payload={details,status};
   const query=record?client.from('workspace_game_records').update(payload).eq('id',record.id):client.from('workspace_game_records').insert(payload);
   const {error}=await query;if(error)throw error;await load();
@@ -46,10 +50,11 @@
  }
  function populate(record){
   const d=record.details;
-  for(const field of fields){const id='review-'+({'scopeType':'scope','scopeName':'scope-name'}[field]||field);if($(id))$(id).value=d[field]||''}
+  for(const field of fields){const id=['required-text','recommended-text','superchat','monetize','source','source-url'].includes(field)?field:'review-'+({'scopeType':'scope','scopeName':'scope-name'}[field]||field);if($(id))$(id).value=d[field]||''}
   for(const [id,val] of [['review-id',record.id],['status',record.status],['review-applicant',applicantName(record)],['review-created-at',d.createdAt||record.created_at],['review-stream-date',d['stream-date']||''],['review-request-note',d['request-note']||'']])if($(id))$(id).value=val;
   window.workspaceRegistry.refresh();
-  toggleScope('review');$('review-form')?.scrollIntoView({behavior:'smooth'});
+  if($('review-stream-period-enabled'))$('review-stream-period-enabled').checked=Boolean(d['stream-end-date']);syncPeriod('review');
+  window.workspaceRegistry?.refresh();toggleScope('review');$('review-form')?.scrollIntoView({behavior:'smooth'});
  }
  function toggleScope(prefix){const maker=value(prefix,'entryType')==='maker';
   document.querySelector(`.individual-title-field[data-prefix="${prefix}"]`)?.toggleAttribute('hidden',maker);
@@ -57,7 +62,7 @@
   document.querySelector(`.maker-custom-scope[data-prefix="${prefix}"]`)?.toggleAttribute('hidden',value(prefix,'scopeType')!=='series');
  }
  function card(parent,record){
-  const card=text(parent,'article','');card.className='permission-entry';text(card,'h3',title(record));text(card,'p','許諾状況：'+record.status);
+  const card=text(parent,'article','');card.className='permission-entry';const heading=text(card,'h3','');heading.className='game-title-heading';text(heading,'span',title(record));if(page==='approved'&&expiryText(record.details)){const badge=text(heading,'span',expiryText(record.details));badge.className='stream-period-badge';}text(card,'p','許諾状況：'+record.status);
   if(page==='pending'){
    text(card,'p','申請者：'+(applicantName(record)));
    text(card,'p','備考：'+(record.details['request-note']||'なし'));
@@ -68,7 +73,7 @@
   const detail=text(card,'section','');detail.className='approved-detail';detail.hidden=true;
   button(actions,'詳細',()=>{detail.hidden=!detail.hidden;if(detail.hidden)return;detail.replaceChildren();
    for(const [label,key] of detailFields){const v=record.details[key];if(!v)continue;
-    if(label.includes('URL')||['ゲームストア','公式サイト'].includes(label))urlLink(detail,label,v);else text(detail,'p',label+'：'+v)}
+    if(key==='stream-end-date')text(detail,'p',label+'：'+expiryText(record.details));else if(key==='entryType')text(detail,'p',label+'：'+(v==='maker'?'メーカー全タイトル':'個別ゲーム'));else if(label.includes('URL'))urlLink(detail,label,v);else text(detail,'p',label+'：'+v)}
    if(isOperator)button(detail,'編集',()=>editApproved(record,detail));
   });
   const fav=button(actions,favoriteKeys.has(record.id)?'お気に入り解除':'お気に入り登録',async()=>{
@@ -80,8 +85,9 @@
  }
  function editApproved(record,container){
   const form=text(container,'form','');form.className='permission-form';
-  const labels={entryType:'登録対象',title:'ゲームタイトル',maker:'メーカー',scopeType:'許諾範囲',scopeName:'対象シリーズ名',category:'カテゴリ','store-url':'ストアURL','official-url':'公式サイト','coverage-notes':'注意事項','required-text':'必須記載事項','recommended-text':'推奨記載事項',superchat:'スパチャ・スパステ',monetize:'収益化',source:'許諾根拠','source-url':'参照URL'};
-  for(const field of fields){const label=text(form,'label',labels[field]);const input=text(label,['coverage-notes','required-text','recommended-text'].includes(field)?'textarea':'input','');input.dataset.field=field;input.value=record.details[field]||'';
+  const labels={entryType:'登録対象',title:'ゲームタイトル',maker:'メーカー',scopeType:'許諾範囲',scopeName:'対象シリーズ名',category:'カテゴリ','store-url':'ゲームストアURL','official-url':'ゲーム公式サイト','coverage-notes':'特記事項','stream-end-date':'配信期限','required-text':'必須記載事項','recommended-text':'推奨記載事項',superchat:'スパチャ・スパステ',monetize:'収益化',source:'許諾根拠','source-url':'参照URL'};
+  const orderedFields=['entryType','title','maker','category','store-url','official-url','required-text','recommended-text','coverage-notes','stream-end-date','scopeType','scopeName','superchat','monetize','source','source-url'];
+  for(const field of orderedFields){const label=text(form,'label',labels[field]);const input=text(label,['coverage-notes','required-text','recommended-text'].includes(field)?'textarea':'input','');input.dataset.field=field;input.value=record.details[field]||'';if(field==='stream-end-date')input.type='date';if(field==='entryType')input.readOnly=true;
    if(['maker','category'].includes(field)){input.type='hidden';window.workspaceRegistry.createSelect(input,field);}
   }
   const statusLabel=text(form,'label','許諾状況');const status=text(statusLabel,'select','');for(const s of [...pendingStatuses,'条件付き','許諾済み','不可']){const opt=text(status,'option',s);opt.value=s}status.value=record.status;
@@ -110,15 +116,15 @@
   isOperator=operators.includes(access.role);uid=access.user.id;
   if(page==='pending'&&!isOperator)return;
   for(const prefix of ['review','direct'])for(const suffix of ['entry-type','scope','maker'])$(prefix+'-'+suffix)?.addEventListener('change',()=>toggleScope(prefix));
-  for(const prefix of ['review','direct'])toggleScope(prefix);
+  for(const prefix of ['review','direct']){toggleScope(prefix);$(prefix+'-stream-period-enabled')?.addEventListener('change',()=>syncPeriod(prefix));syncPeriod(prefix);}
   if(page==='pending'){
    const tabs=[ $('tab-pending'),$('tab-add') ],panels=[ $('pending-panel'),$('direct-add-section') ];
    tabs.forEach((tab,i)=>tab?.addEventListener('click',()=>{tabs.forEach((t,j)=>{t.setAttribute('aria-selected',String(i===j));panels[j].hidden=i!==j})}));
    $('review-form')?.addEventListener('submit',async e=>{e.preventDefault();const record=records.find(r=>r.id===$('review-id').value);if(!record)return notice('編集する案件を選択してください。',true);
-    const d={...record.details};for(const field of fields)d[field]=value('review',field);if(d.entryType==='maker'&&!d.maker)return notice('メーカー名が必要です。',true);
+    const d={...record.details};for(const field of fields)d[field]=field==='stream-end-date'?periodValue('review'):value('review',field);if(d.entryType==='maker'&&!d.maker)return notice('メーカー名が必要です。',true);
     try{await persist(record,d,$('status').value);$('review-form').reset();$('review-id').value='';window.scrollTo({top:0,behavior:'smooth'});notice('保存しました。')}catch(err){notice('保存失敗：'+err.message,true)}
    });
-   $('direct-add-form')?.addEventListener('submit',async e=>{e.preventDefault();const d={};for(const field of fields)d[field]=value('direct',field);
+   $('direct-add-form')?.addEventListener('submit',async e=>{e.preventDefault();const d={};for(const field of fields)d[field]=field==='stream-end-date'?periodValue('direct'):value('direct',field);
     if(d.entryType==='maker'?!d.maker:!d.title&&!d.maker)return notice('ゲーム名またはメーカー名を入力してください。',true);
     d.registrationType='direct';d.createdAt=new Date().toISOString();d.applicantId=uid;d.applicantName='運営による直接登録';
     try{await persist(null,d,value('direct','status')||'未確認');$('direct-add-form').reset()}catch(err){notice('登録失敗：'+err.message,true)}
