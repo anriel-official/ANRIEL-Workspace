@@ -416,3 +416,9 @@ button.registry-choice[aria-pressed="true"] { background:#e8e5fb; border-color:#
 .registry-custom-row { display:flex; flex-wrap:wrap; gap:8px; }
 .registry-custom-row input { flex:1 1 220px; min-width:0; }
 .registry-custom-row button { flex:0 0 auto; }
+
+/* Shared registry dropdown, matching the entry-type select */
+.registry-chooser {display:grid;gap:8px;margin:8px 0 16px;}
+.registry-chooser .registry-select {width:100%;max-width:100%;font:inherit;}
+.registry-chooser .registry-custom-input[hidden] {display:none!important;}
+.registry-chooser .registry-custom-input {width:100%;box-sizing:border-box;font:inherit;}

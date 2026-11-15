@@ -82,7 +82,7 @@
   const form=text(container,'form','');form.className='permission-form';
   const labels={entryType:'登録対象',title:'ゲームタイトル',maker:'メーカー',scopeType:'許諾範囲',scopeName:'対象シリーズ名',category:'カテゴリ','store-url':'ストアURL','official-url':'公式サイト','coverage-notes':'注意事項','required-text':'必須記載事項','recommended-text':'推奨記載事項',superchat:'スパチャ・スパステ',monetize:'収益化',source:'許諾根拠','source-url':'参照URL'};
   for(const field of fields){const label=text(form,'label',labels[field]);const input=text(label,['coverage-notes','required-text','recommended-text'].includes(field)?'textarea':'input','');input.dataset.field=field;input.value=record.details[field]||'';
-   if(['maker','category'].includes(field)){input.type='hidden';const wrap=text(label,'div','');wrap.className='registry-choices';const choices=['',...window.workspaceRegistry.entries()[field]];if(input.value&&!choices.includes(input.value))choices.push(input.value);for(const v of choices){const b=button(wrap,v||'未設定',()=>{input.value=v;for(const x of wrap.querySelectorAll('button'))x.setAttribute('aria-pressed',String(x===b));});b.className='registry-choice';b.setAttribute('aria-pressed',String(v===input.value));}const extra=text(label,'input','');extra.placeholder='新しい'+labels[field]+'を入力';extra.maxLength=field==='maker'?200:100;extra.addEventListener('change',()=>{if(extra.value.trim())input.value=extra.value.trim();});}
+   if(['maker','category'].includes(field)){input.type='hidden';window.workspaceRegistry.createSelect(input,field);}
   }
   const statusLabel=text(form,'label','許諾状況');const status=text(statusLabel,'select','');for(const s of [...pendingStatuses,'条件付き','許諾済み','不可']){const opt=text(status,'option',s);opt.value=s}status.value=record.status;
   const submit=text(form,'button','保存');submit.type='submit';
