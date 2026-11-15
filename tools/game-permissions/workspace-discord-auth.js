@@ -48,7 +48,12 @@
   }
   document.body.hidden=false;
   if (document.body.dataset.page !== 'mypage') {
-   const script=document.createElement('script');script.src=['pending','approved'].includes(document.body.dataset.page)?'workspace-game-cloud.js':'game-pages.js';document.body.appendChild(script);
+   const page=document.body.dataset.page;
+   if(['pending','approved','registry'].includes(page)){
+    const registryScript=document.createElement('script');registryScript.src='workspace-registry-cloud.js';
+    registryScript.onload=()=>{const script=document.createElement('script');script.src=page==='registry'?'workspace-registry-admin.js':'workspace-game-cloud.js';document.body.appendChild(script);};
+    document.body.appendChild(registryScript);
+   }else{const script=document.createElement('script');script.src='game-pages.js';document.body.appendChild(script);}
   }
  }
  if(!login)document.body.hidden=true;
