@@ -136,3 +136,13 @@ body > header .workspace-account-name {display:inline;max-width:155px;}
 body > header .workspace-account {gap:10px;}
 .portal-header-actions {margin-left:auto;}
 @media(max-width:600px){body > header .workspace-account-link{max-width:180px}body > header .workspace-account-name{max-width:100px}}
+
+/* Header account layout for portal and all game pages */
+body > header .workspace-account {display:flex;align-items:center;gap:12px;margin-left:auto;min-width:0}
+body > header .workspace-account-link {display:inline-flex;align-items:center;gap:9px;padding:5px 10px;border:1px solid #e0e3ec;border-radius:999px;background:#fff;max-width:260px;min-width:0;text-decoration:none}
+body > header .workspace-account-name {display:inline;max-width:165px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body > header .workspace-account-avatar,body > header .workspace-avatar-fallback {width:32px;height:32px}
+body > header .workspace-header-logout,body > header #portal-logout {border:1px solid #d9dce7;border-radius:10px;background:#fff;padding:9px 14px;color:#25273a;cursor:pointer;white-space:nowrap}
+body > header .workspace-header-logout:hover,body > header #portal-logout:hover {border-color:#8c7ee5;background:#f5f3ff}
+body > header .portal-header-actions {display:flex;align-items:center;gap:12px;margin-left:auto}
+@media(max-width:600px){body > header .workspace-account-name{max-width:100px}body > header .workspace-account-link{max-width:175px}}

@@ -58,7 +58,7 @@
     // On the portal, keep the existing logout button to avoid duplicating sign-out controls.
     if (!isTool) {
       const portalActions = header.querySelector('.portal-header-actions');
-      if (portalActions) portalActions.prepend(area);
+      if (portalActions) portalActions.insertBefore(area, portalActions.querySelector('#portal-logout'));
       else header.append(area);
     } else {
       header.append(area);
