@@ -78,8 +78,14 @@
   if(error||!data?.notified)throw Error(data?.error||error?.message||'Discord通知に失敗しました。');
  }
  async function remove(record){
-  if(!isOperator||!confirm(`「${title(record)}」を削除しますか？`))return;
-  try{const {error}=await client.from('workspace_game_records').delete().eq('id',record.id);if(error)throw error;await load()}catch(e){notice('削除失敗：'+e.message,true)}
+  if(!isOperator)return;
+  if(!confirm(`「${title(record)}」を完全に削除しますか？\n関連する申請・お気に入り・個人メモ・通知待ちデータも削除されます。\nこの操作は元に戻せません。`))return;
+  try{
+   const {data,error}=await client.rpc('workspace_delete_game_permanently',{p_record_id:record.id});
+   if(error)throw error;
+   if(data!==true)throw Error('削除が完了しませんでした。');
+   await load();notice('ゲームと関連データをデータベースから完全に削除しました。');
+  }catch(e){notice('削除失敗：'+e.message,true)}
  }
  function populate(record){
   const d=record.details;
