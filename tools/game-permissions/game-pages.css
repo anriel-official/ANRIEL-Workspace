@@ -453,3 +453,28 @@ body > header.workspace-unified-header .workspace-header-logout {
 }
 body > header.workspace-unified-header .workspace-header-logout:hover {border-color:#8c7ee5;background:#f5f3ff;text-decoration:none;}
 @media(max-width:600px){body > header.workspace-unified-header .workspace-account-name{max-width:100px}}
+
+/* Stream deadline: left-aligned checkbox, compact date field */
+.permission-form .stream-period-field {
+  display:flex;flex-direction:column;align-items:flex-start;
+  gap:10px;margin:6px 0 20px;padding:14px 16px;
+  border:1px solid var(--gp-border);border-radius:10px;background:#fafbfe;
+}
+.permission-form .stream-period-check {
+  display:inline-flex;flex-direction:row;justify-content:flex-start;
+  align-items:center;align-self:flex-start;gap:10px;
+  width:auto;margin:0;padding:0;font-weight:500;cursor:pointer;
+}
+.permission-form .stream-period-check input[type="checkbox"] {
+  appearance:auto;display:inline-block;flex:0 0 17px;
+  width:17px!important;height:17px!important;min-width:17px!important;
+  min-height:17px!important;margin:0!important;padding:0!important;
+  vertical-align:middle;accent-color:var(--gp-accent);
+}
+.permission-form .stream-period-field input[type="date"] {
+  width:min(100%,260px);max-width:260px;box-sizing:border-box;
+}
+.permission-form .stream-period-field input[type="date"]:disabled {
+  opacity:.55;background:#f0f1f5;
+}
+.permission-form .stream-period-field small {line-height:1.6;}
