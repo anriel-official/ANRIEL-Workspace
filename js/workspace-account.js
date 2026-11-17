@@ -38,10 +38,28 @@
     const avatar = document.createElement('img'); avatar.className = 'workspace-account-avatar'; avatar.alt = ''; avatar.hidden = true;
     const fallback = document.createElement('span'); fallback.className = 'workspace-avatar-fallback'; fallback.textContent = 'U';
     const name = document.createElement('span'); name.className = 'workspace-account-name'; name.textContent = 'マイページ';
-    link.append(avatar,fallback,name);area.append(link);header.append(area);
+    link.append(avatar,fallback,name);area.append(link);
+    if (isTool) {
+      const logout = document.createElement('button');
+      logout.type = 'button';
+      logout.className = 'workspace-header-logout';
+      logout.textContent = 'ログアウト';
+      logout.hidden = true;
+      logout.addEventListener('click', async () => {
+        const client = getClient();
+        if (!client) return;
+        logout.disabled = true;
+        const {error} = await client.auth.signOut();
+        if (error) { console.error('Logout failed:',error); logout.disabled = false; alert('ログアウトできませんでした。'); return; }
+        location.replace(loginUrl);
+      });
+      area.append(logout);
+    }
+    header.append(area);
     const client = getClient(); if (!client) return;
     const {data:{user},error} = await client.auth.getUser();
     if (error || !user) { link.href = loginUrl; name.textContent = 'ログイン'; return; }
+    if (isTool) area.querySelector('.workspace-header-logout').hidden = false;
     const p = await profile(client,user);
     name.textContent = p.name;
     if (p.avatar && /^https:\/\//.test(p.avatar)) {

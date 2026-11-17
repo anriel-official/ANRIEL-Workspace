@@ -431,3 +431,11 @@ button.registry-choice[aria-pressed="true"] { background:#e8e5fb; border-color:#
 .stream-period-field small{color:#687082;}
 .game-title-heading{display:flex;align-items:center;flex-wrap:wrap;gap:8px;}
 .stream-period-badge{display:inline-flex;align-items:center;border:1.5px solid #c42c37;border-radius:999px;padding:3px 9px;color:#bd2330;font-size:12px;font-weight:700;line-height:1.4;white-space:nowrap;}
+
+/* Minimal shared header navigation: workspace > game management */
+body > header.workspace-unified-header { display:flex; align-items:center; flex-wrap:nowrap; gap:20px; }
+.workspace-unified-header .workspace-header-brand { order:0; flex:none; }
+.workspace-unified-header .workspace-header-tool { order:1; font-size:14px; font-weight:600; color:#50498a; text-decoration:none; white-space:nowrap; }
+.workspace-unified-header .workspace-header-tool:hover { text-decoration:underline; }
+.workspace-unified-header .workspace-account { order:2; margin-left:auto; gap:12px; flex:none; }
+@media(max-width:600px) { body > header.workspace-unified-header { gap:10px; flex-wrap:wrap; } .workspace-unified-header .workspace-account { margin-left:auto; } .workspace-unified-header .workspace-header-tool { font-size:12px; } }

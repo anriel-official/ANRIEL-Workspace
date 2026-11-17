@@ -63,7 +63,7 @@
             status.classList.add('portal-error');
             logout.hidden = false;
           } else {
-            userLabel.textContent = roles[role] + 'としてログイン中';
+
             status.hidden = true;
             content.hidden = false;
             logout.hidden = false;
@@ -86,7 +86,6 @@
   <header class="portal-header">
     <a class="portal-brand" href="./">ANRIEL Workspace</a>
     <div class="portal-header-actions">
-      <span class="portal-user" id="portal-user"></span>
       <button class="portal-button" id="portal-logout" type="button" hidden>ログアウト</button>
     </div>
   </header>
