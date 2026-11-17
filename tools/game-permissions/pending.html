@@ -25,7 +25,7 @@
 <form id="review-form" class="permission-form">
 <input id="review-id" type="hidden">
 <label for="review-entry-type">登録対象</label><select id="review-entry-type"><option value="game">個別ゲーム</option><option value="maker">メーカー全タイトル</option></select>
-<div class="individual-title-field" data-prefix="review"><label for="review-title">ゲームタイトル</label><input id="review-title" maxlength="200"></div><div class="maker-scope-fields" data-prefix="review" hidden><label for="review-scope">許諾対象範囲</label><select id="review-scope"><option value="all">全タイトル</option><option value="partial">一部タイトル</option><option value="series">特定シリーズ・作品群</option></select><div class="maker-custom-scope" data-prefix="review" hidden><label for="review-scope-name">対象シリーズ・作品群の名称</label><input id="review-scope-name" maxlength="200" placeholder="例：○○シリーズ全作品"></div><p class="maker-preview" id="review-preview" aria-live="polite"></p></div>
+<div class="individual-title-field" data-prefix="review"><label for="review-title">ゲームタイトル</label><input id="review-title" maxlength="200"></div>
 <label for="review-maker">メーカー</label><input id="review-maker" list="maker-options" maxlength="200">
 <label for="review-category">カテゴリ</label><input id="review-category" list="category-options" maxlength="100"><datalist id="maker-options"></datalist>
 <label for="review-store-url">ゲームストアURL</label><input id="review-store-url" type="url" placeholder="https://...">
@@ -53,7 +53,7 @@
 <p>ゲーム名だけでなく、メーカー単位の包括許諾も登録できます。メーカー単位の場合、ゲームタイトルの入力は不要です。入力項目はすべて任意ですが、ゲーム名またはメーカー名のいずれかを入力してください。</p>
 <form id="direct-add-form">
 <label for="direct-entry-type">登録対象</label><select id="direct-entry-type"><option value="game">個別ゲーム</option><option value="maker">メーカー全タイトル</option></select>
-<div class="individual-title-field" data-prefix="direct"><label for="direct-title">ゲームタイトル</label><input id="direct-title" maxlength="200"></div><div class="maker-scope-fields" data-prefix="direct" hidden><label for="direct-scope">許諾対象範囲</label><select id="direct-scope"><option value="all">全タイトル</option><option value="partial">一部タイトル</option><option value="series">特定シリーズ・作品群</option></select><div class="maker-custom-scope" data-prefix="direct" hidden><label for="direct-scope-name">対象シリーズ・作品群の名称</label><input id="direct-scope-name" maxlength="200" placeholder="例：○○シリーズ全作品"></div><p class="maker-preview" id="direct-preview" aria-live="polite"></p></div>
+<div class="individual-title-field" data-prefix="direct"><label for="direct-title">ゲームタイトル</label><input id="direct-title" maxlength="200"></div>
 <label for="direct-maker">メーカー</label><input id="direct-maker" list="maker-options" maxlength="200">
 <label for="direct-category">カテゴリ</label><input id="direct-category" list="category-options" maxlength="100">
 <label for="direct-store-url">ゲームストアURL</label><input id="direct-store-url" type="url" placeholder="https://...">

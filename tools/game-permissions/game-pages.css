@@ -462,10 +462,5 @@ body > header.workspace-unified-header .workspace-header-logout:hover {border-co
 .permission-notify-members{display:flex;flex-wrap:wrap;gap:8px 18px}
 .permission-discord-notify textarea{width:100%;box-sizing:border-box}
 
-/* Explicit stream period alignment: override generic form label styles */
-.permission-form .stream-period-field{display:flex;flex-direction:column;align-items:flex-start;gap:10px;margin:6px 0 18px;padding:14px 16px;border:1px solid #dce0e9;border-radius:10px;background:#fafbfe}
-.permission-form .stream-period-field > label.stream-period-check{display:inline-flex;flex-direction:row;align-items:center;justify-content:flex-start;align-self:flex-start;gap:10px;width:auto;max-width:100%;margin:0;padding:0;font-weight:500;cursor:pointer}
-.permission-form .stream-period-field > label.stream-period-check > input[type=checkbox]{display:block;appearance:auto;width:17px!important;min-width:17px!important;max-width:17px!important;height:17px!important;min-height:17px!important;flex:0 0 17px;margin:0!important;padding:0!important;accent-color:#50498a}
-.permission-form .stream-period-field > input[type=date]{width:min(100%,260px);max-width:260px;box-sizing:border-box}
-.permission-form .stream-period-field > input[type=date]:disabled{opacity:.55}
-.permission-form .stream-period-field > small{display:block;margin:0;line-height:1.6}
+.maker-list-section > summary { cursor:pointer; font-weight:700; padding:14px 12px; }
+.maker-list-section > .permission-list { padding-top:12px; }
