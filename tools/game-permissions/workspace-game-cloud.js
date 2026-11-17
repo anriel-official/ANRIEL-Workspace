@@ -169,7 +169,20 @@
    const label=text(form,'label',labels[field]);
    const input=text(label,['coverage-notes','required-text','recommended-text'].includes(field)?'textarea':'input','');
    input.dataset.field=field;input.value=record.details[field]||'';
-   if(field==='stream-end-date')input.type='date';
+   if(field==='stream-end-date'){
+    input.type='date';
+    const periodLabel=document.createElement('label');periodLabel.className='stream-period-check';
+    const checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.checked=Boolean(record.details['stream-end-date']);
+    periodLabel.append(checkbox,document.createTextNode(' 配信期限あり'));
+    const periodField=document.createElement('div');periodField.className='stream-period-field';
+    label.parentNode.insertBefore(periodField,label);
+    periodField.append(label,periodLabel);
+    label.classList.add('stream-period-date-label');
+    const dateInput=input;
+    dateInput.disabled=!checkbox.checked;
+    checkbox.addEventListener('change',()=>{dateInput.disabled=!checkbox.checked;if(!checkbox.checked)dateInput.value='';});
+    periodField.insertBefore(periodLabel,label);
+   }
    if(['maker','category'].includes(field)){input.type='hidden';window.workspaceRegistry.createSelect(input,field);}
   }
   const updateEditorFields=()=>{

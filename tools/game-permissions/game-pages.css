@@ -464,3 +464,17 @@ body > header.workspace-unified-header .workspace-header-logout:hover {border-co
 
 .maker-list-section > summary { cursor:pointer; font-weight:700; padding:14px 12px; }
 .maker-list-section > .permission-list { padding-top:12px; }
+
+/* 配信期間有無・期限: permission-form の共通 label スタイルより優先 */
+.permission-form .stream-period-field { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.permission-form .stream-period-field > label.stream-period-check { display: inline-flex !important; flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; align-self: flex-start; width: auto !important; max-width: 100%; margin: 0 !important; gap: 8px !important; text-align: left; font-weight: 500; cursor: pointer; }
+.permission-form .stream-period-field > label.stream-period-check > input[type="checkbox"] { appearance: auto; display: inline-block; width: 17px !important; height: 17px !important; min-width: 17px !important; min-height: 17px !important; margin: 0 !important; padding: 0 !important; flex: 0 0 17px !important; vertical-align: middle; }
+.permission-form .stream-period-field > input[type="date"] { width: min(260px, 100%); max-width: 100%; }
+
+/* 配信期限チェック: 許諾中、新規追加、許諾済み編集に共通適用 */
+.stream-period-field {display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:8px!important;width:100%;}
+.stream-period-field .stream-period-check {display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;align-self:flex-start!important;gap:8px!important;width:max-content!important;max-width:100%!important;margin:0!important;padding:0!important;text-align:left!important;white-space:normal!important;cursor:pointer;}
+.stream-period-field .stream-period-check > input[type="checkbox"] {appearance:auto!important;display:block!important;position:static!important;width:17px!important;height:17px!important;min-width:17px!important;min-height:17px!important;max-width:17px!important;margin:0!important;padding:0!important;flex:0 0 17px!important;transform:none!important;}
+.stream-period-field input[type="date"] {box-sizing:border-box;max-width:260px!important;width:100%!important;}
+.stream-period-field .stream-period-date-label {display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin:0!important;}
+.stream-period-field .stream-period-date-label input[type="date"] {display:block;}
