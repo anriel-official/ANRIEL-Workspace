@@ -196,7 +196,7 @@
   updateEditorFields();
   const statusLabel=text(form,'label','許諾状況');
   const status=text(statusLabel,'select','');
-  for(const s of [...pendingStatuses,'条件付き','許諾済み','不可']){
+  for(const s of [...pendingStatuses,'条件付き','許諾済み','事務所許可','不可']){
    const opt=text(status,'option',s);opt.value=s;
   }
   status.value=record.status;

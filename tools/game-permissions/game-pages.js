@@ -63,7 +63,7 @@
         ['required-text', '必須記載事項', 'textarea'],
         ['recommended-text', '推奨記載事項', 'textarea'],
         ['superchat', 'スパチャ・スパステ', ['未確認', 'OK', 'NG']],
-        ['status', '許諾状況', ['未確認', '確認中', '申請中', '条件付き', '許諾済み', '不可']],
+        ['status', '許諾状況', ['未確認', '確認中', '申請中', '条件付き', '許諾済み', '事務所許可', '不可']],
         ['monetize', '収益化', ['未確認', '可能', '条件付き', '不可']],
         ['source', '許諾の根拠', ['未確認', '公式ガイドライン', '個別許諾']],
         ['source-url', '参照URL（任意）', 'url']
@@ -187,7 +187,7 @@
     function renderPending() {
         const list = get('pending-list'); if (!list) return;
         list.replaceChildren();
-        const pendingGames = games.filter(g => !['条件付き', '許諾済み', '不可'].includes(g.status));
+        const pendingGames = games.filter(g => !['条件付き', '許諾済み', '事務所許可', '不可'].includes(g.status));
         if (get('pending-count')) get('pending-count').textContent = `${pendingGames.length}件`;
         if (get('pending-tab-count')) get('pending-tab-count').textContent = String(pendingGames.length);
         if (!pendingGames.length) el(list, 'p', '対応中の申請・登録はありません。');
@@ -275,7 +275,7 @@
         registry.category = sorted([...registry.category, record.category]);
         saveRegistry(); save(); renderPending();
         get('direct-add-form').reset(); updateScopeFields('direct');
-        alert(['条件付き', '許諾済み', '不可'].includes(record.status)
+        alert(['条件付き', '許諾済み', '事務所許可', '不可'].includes(record.status)
             ? '登録しました。許諾済みゲーム一覧に表示されます。'
             : '登録しました。許諾中一覧に表示されます。');
     });
@@ -297,7 +297,7 @@
         registry.maker = sorted([...registry.maker, g.maker]);
         for (const field of ['category','required-text','recommended-text','superchat','status','monetize','source','source-url']) g[field] = get(field === 'category' ? 'review-category' : field).value.trim();
         registry.category = sorted([...registry.category, g.category]); saveRegistry();
-        g.updatedAt = new Date().toISOString(); save(); renderPending(); if (['条件付き', '許諾済み', '不可'].includes(g.status)) { get('review-form').reset(); get('review-id').value = ''; } alert(['条件付き', '許諾済み', '不可'].includes(g.status) ? 'ゲーム一覧に移動しました。' : '許諾情報を保存しました。');
+        g.updatedAt = new Date().toISOString(); save(); renderPending(); if (['条件付き', '許諾済み', '事務所許可', '不可'].includes(g.status)) { get('review-form').reset(); get('review-id').value = ''; } alert(['条件付き', '許諾済み', '事務所許可', '不可'].includes(g.status) ? 'ゲーム一覧に移動しました。' : '許諾情報を保存しました。');
     });
     get('extract')?.addEventListener('click', () => {
         const raw = get('raw').value;
