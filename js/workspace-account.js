@@ -55,7 +55,14 @@
       });
       area.append(logout);
     }
-    header.append(area);
+    // On the portal, keep the existing logout button to avoid duplicating sign-out controls.
+    if (!isTool) {
+      const portalActions = header.querySelector('.portal-header-actions');
+      if (portalActions) portalActions.prepend(area);
+      else header.append(area);
+    } else {
+      header.append(area);
+    }
     const client = getClient(); if (!client) return;
     const {data:{user},error} = await client.auth.getUser();
     if (error || !user) { link.href = loginUrl; name.textContent = 'ログイン'; return; }
