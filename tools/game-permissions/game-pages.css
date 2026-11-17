@@ -478,3 +478,20 @@ body > header.workspace-unified-header .workspace-header-logout:hover {border-co
 .stream-period-field input[type="date"] {box-sizing:border-box;max-width:260px!important;width:100%!important;}
 .stream-period-field .stream-period-date-label {display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin:0!important;}
 .stream-period-field .stream-period-date-label input[type="date"] {display:block;}
+
+/* Stream-period checkbox: override the generic full-width form input rule. */
+.permission-form .stream-period-field > .stream-period-check {
+  display: inline-flex !important; flex-direction: row !important; align-items: center !important;
+  justify-content: flex-start !important; width: fit-content !important;
+  max-width: 100% !important; align-self: flex-start !important;
+  margin: 0 !important; padding: 0 !important; gap: 8px !important;
+}
+.permission-form .stream-period-field > .stream-period-check > input[type="checkbox"] {
+  box-sizing: border-box !important; appearance: auto !important;
+  display: inline-block !important; position: static !important;
+  width: 17px !important; height: 17px !important;
+  min-width: 17px !important; max-width: 17px !important;
+  min-height: 17px !important; max-height: 17px !important;
+  padding: 0 !important; margin: 0 !important; border-radius: 3px !important;
+  flex: 0 0 17px !important; transform: none !important;
+}
