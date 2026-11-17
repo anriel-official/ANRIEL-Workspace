@@ -12,6 +12,9 @@
   if(!client)return {error:'Supabase接続設定がありません。'};
   const {data:{user},error}=await client.auth.getUser();
   if(error||!user)return {error:'ログインしてください。'};
+  // Verify the Discord identity on the server and link only this authenticated user.
+  const {error:linkError}=await client.rpc('workspace_link_my_discord_member');
+  if(linkError)return {error:'メンバー認証の紐付けに失敗しました：'+linkError.message};
   const {data:role,error:roleError}=await client.rpc('workspace_my_discord_role');
   if(roleError)return {error:'権限を取得できません：'+roleError.message};
   if(!roles[role])return {error:'Discordアカウントが未登録、または無効です。'};

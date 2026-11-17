@@ -9,7 +9,7 @@
  let records=[],isOperator=false,uid='',favoriteKeys=new Set(),applicantNames=new Map();
  const applicantName=record=>{
   const d=record.details||{};
-  return applicantNames.get(d.applicantId)||d.applicantName||d.applicantId||'申請者未設定';
+  return applicantNames.get(d.applicantId)||((d.applicantName && !/^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(d.applicantName)) ? d.applicantName : '')||'申請者未設定';
  };
  async function loadApplicantNames(){
   if(!isOperator)return;
