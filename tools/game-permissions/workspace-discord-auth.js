@@ -54,7 +54,7 @@
    const page=document.body.dataset.page;
    if(['pending','approved','registry'].includes(page)){
     const registryScript=document.createElement('script');registryScript.src='workspace-registry-cloud.js';
-    registryScript.onload=()=>{const script=document.createElement('script');script.src=page==='registry'?'workspace-registry-admin.js':'workspace-game-cloud.js';document.body.appendChild(script);};
+    registryScript.onload=()=>{const script=document.createElement('script');script.src=page==='registry'?'workspace-registry-admin.js':'workspace-game-cloud.js?v=20261117-discordnotify';document.body.appendChild(script);};
     document.body.appendChild(registryScript);
    }else{const script=document.createElement('script');script.src='game-pages.js';document.body.appendChild(script);}
   }

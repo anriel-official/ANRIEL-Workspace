@@ -44,6 +44,39 @@
   const query=record?client.from('workspace_game_records').update(payload).eq('id',record.id):client.from('workspace_game_records').insert(payload);
   const {error}=await query;if(error)throw error;await load();
  }
+ const notificationMembers=async()=>{
+  const {data,error}=await client.rpc('workspace_list_discord_members');
+  if(error)throw error;
+  return (Array.isArray(data)?data:[]).filter(m=>m.discord_id&&m.display_name);
+ };
+ async function notificationControls(form){
+  const panel=text(form,'fieldset','');panel.className='permission-discord-notify';
+  text(panel,'legend','Discord通知（任意）');
+  const label=text(panel,'label','');label.className='permission-notify-toggle';
+  const enabled=text(label,'input','');enabled.type='checkbox';
+  text(label,'span','保存後にDiscordへ通知する');
+  const options=text(panel,'div','');options.hidden=true;
+  const memberBox=text(options,'div','');memberBox.className='permission-notify-members';
+  text(options,'p','メンションするメンバー（複数選択可・未選択ならメンションなし）');
+  const noteLabel=text(options,'label','追加メッセージ（任意）');
+  const note=text(noteLabel,'textarea','');note.maxLength=500;note.rows=2;
+  enabled.addEventListener('change',()=>{options.hidden=!enabled.checked});
+  try{
+   const members=await notificationMembers();
+   for(const m of members){
+    const row=text(memberBox,'label','');row.className='permission-notify-member';
+    const check=text(row,'input','');check.type='checkbox';check.value=String(m.discord_id);
+    text(row,'span',m.display_name);
+   }
+   if(!members.length)text(memberBox,'p','メンションできる登録メンバーがいません。');
+  }catch(e){text(memberBox,'p','メンバー取得に失敗しました。通知はメンションなしで送れます。');}
+  return ()=>enabled.checked?{memberIds:[...memberBox.querySelectorAll('input:checked')].map(x=>x.value),message:note.value.trim()}:null;
+ }
+ async function sendPermissionNotification(recordId,selection){
+  if(!selection)return;
+  const {data,error}=await client.functions.invoke('notify-game-permission',{body:{recordId,memberIds:selection.memberIds,message:selection.message}});
+  if(error||!data?.notified)throw Error(data?.error||error?.message||'Discord通知に失敗しました。');
+ }
  async function remove(record){
   if(!isOperator||!confirm(`「${title(record)}」を削除しますか？`))return;
   try{const {error}=await client.from('workspace_game_records').delete().eq('id',record.id);if(error)throw error;await load()}catch(e){notice('削除失敗：'+e.message,true)}
@@ -83,7 +116,7 @@
   });
   if(isOperator)button(actions,'削除',()=>remove(record));
  }
- function editApproved(record,container){
+ async function editApproved(record,container){
   const form=text(container,'form','');form.className='permission-form';
   const labels={entryType:'登録対象',title:'ゲームタイトル',maker:'メーカー',scopeType:'許諾範囲',scopeName:'対象シリーズ名',category:'カテゴリ','store-url':'ゲームストアURL','official-url':'ゲーム公式サイト','coverage-notes':'特記事項','stream-end-date':'配信期限','required-text':'必須記載事項','recommended-text':'推奨記載事項',superchat:'スパチャ・スパステ',monetize:'収益化',source:'許諾根拠','source-url':'参照URL'};
   const orderedFields=['entryType','title','maker','category','store-url','official-url','required-text','recommended-text','coverage-notes','stream-end-date','scopeType','scopeName','superchat','monetize','source','source-url'];
@@ -117,9 +150,10 @@
    const opt=text(status,'option',s);opt.value=s;
   }
   status.value=record.status;
+  const getNotification=await notificationControls(form);
   const submit=text(form,'button','保存');submit.type='submit';
   form.addEventListener('submit',async e=>{e.preventDefault();const d={...record.details};for(const input of form.querySelectorAll('[data-field]'))d[input.dataset.field]=input.value.trim();
-   try{await persist(record,d,status.value)}catch(err){notice('保存失敗：'+err.message,true)}});
+   try{const selected=getNotification();await persist(record,d,status.value);try{await sendPermissionNotification(record.id,selected);if(selected)notice('保存してDiscordへ通知しました。')}catch(e){notice('保存しましたが通知に失敗しました：'+e.message,true)}}catch(err){notice('保存失敗：'+err.message,true)}});
  }
  function render(){
   if(page==='pending'){
@@ -146,9 +180,10 @@
   if(page==='pending'){
    const tabs=[ $('tab-pending'),$('tab-add') ],panels=[ $('pending-panel'),$('direct-add-section') ];
    tabs.forEach((tab,i)=>tab?.addEventListener('click',()=>{tabs.forEach((t,j)=>{t.setAttribute('aria-selected',String(i===j));panels[j].hidden=i!==j})}));
+   const reviewNotify=await notificationControls($('review-form'));
    $('review-form')?.addEventListener('submit',async e=>{e.preventDefault();const record=records.find(r=>r.id===$('review-id').value);if(!record)return notice('編集する案件を選択してください。',true);
     const d={...record.details};for(const field of fields)d[field]=field==='stream-end-date'?periodValue('review'):value('review',field);if(d.entryType==='maker'&&!d.maker)return notice('メーカー名が必要です。',true);
-    try{await persist(record,d,$('status').value);$('review-form').reset();$('review-id').value='';window.scrollTo({top:0,behavior:'smooth'});notice('保存しました。')}catch(err){notice('保存失敗：'+err.message,true)}
+    try{const selected=reviewNotify();await persist(record,d,$('status').value);$('review-form').reset();$('review-id').value='';window.scrollTo({top:0,behavior:'smooth'});notice('保存しました。');try{await sendPermissionNotification(record.id,selected);if(selected)notice('保存してDiscordへ通知しました。')}catch(e){notice('保存しましたがDiscord通知に失敗しました：'+e.message,true)}}catch(err){notice('保存失敗：'+err.message,true)}
    });
    $('direct-add-form')?.addEventListener('submit',async e=>{e.preventDefault();const d={};for(const field of fields)d[field]=field==='stream-end-date'?periodValue('direct'):value('direct',field);
     if(d.entryType==='maker'?!d.maker:!d.title&&!d.maker)return notice('ゲーム名またはメーカー名を入力してください。',true);
