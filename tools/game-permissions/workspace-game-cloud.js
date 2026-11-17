@@ -123,6 +123,8 @@
   if(isOperator)button(actions,'削除',()=>remove(record));
  }
  async function editApproved(record,container){
+  // Repeated clicks must not append duplicate edit forms.
+  if(container.querySelector('form.permission-form'))return;
   const form=text(container,'form','');form.className='permission-form';
   const labels={entryType:'登録対象',title:'ゲームタイトル',maker:'メーカー',scopeType:'許諾範囲',scopeName:'対象シリーズ名',category:'カテゴリ','store-url':'ゲームストアURL','official-url':'ゲーム公式サイト','coverage-notes':'特記事項','stream-end-date':'配信期限','required-text':'必須記載事項','recommended-text':'推奨記載事項',superchat:'スパチャ・スパステ',monetize:'収益化',source:'許諾根拠','source-url':'参照URL'};
   const orderedFields=['entryType','title','maker','category','store-url','official-url','required-text','recommended-text','coverage-notes','stream-end-date','scopeType','scopeName','superchat','monetize','source','source-url'];
